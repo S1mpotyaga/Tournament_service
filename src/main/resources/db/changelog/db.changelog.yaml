@@ -1,0 +1,3 @@
+
+databaseChangeLog:
+  - include: changes/V1_init_table.sql
