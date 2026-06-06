@@ -97,8 +97,6 @@ create table tournament_match (
     match_id serial primary key,
     participant_id_1 integer not null,
     participant_id_2 integer not null,
-    score_1 integer not null check ( score_1 >= 0),
-    score_2 integer not null check ( score_2 >= 0),
     tournament_id integer not null,
     winner_id integer,
     status match_status not null default 'PENDING',
@@ -114,16 +112,19 @@ create table tournament_match (
     constraint fk_match_winner
         foreign key (winner_id)
             references tournament_participant(tournament_participant_id),
+
     constraint fk_match_tournament
         foreign key (tournament_id)
             references tournament(tournament_id)
             on delete cascade,
+
     constraint chk_winner
         check (
             winner_id is null
                 or winner_id = participant_id_1
                 or winner_id = participant_id_2
             ),
+
     constraint chk_players
         check (participant_id_1 <> participant_id_2)
 );
