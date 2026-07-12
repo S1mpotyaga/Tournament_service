@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16
+    container_name: tournament-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tournament-db
+      POSTGRES_USER: molodec
+      POSTGRES_PASSWORD: glebmolodec
+    ports:
+      - "25432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tournament-network
+
+  tournament-api-service:
+    build:
+      context: ApiService/
+      dockerfile: Dockerfile
+    container_name: tournament-api-service
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: tournament-db
+      DB_USER: molodec
+      DB_PASSWORD: glebmolodec
+    ports:
+      - "8081:8080"
+    networks:
+      - tournament-network
+
+volumes:
+  postgres_data:
+
+networks:
+  tournament-network:
+    driver: bridge
