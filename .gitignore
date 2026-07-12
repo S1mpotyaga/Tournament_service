@@ -25,3 +25,7 @@ replay_pid*
 
 # Documentation
 /docs/
+
+# Enviroments
+.env.local
+.env.prod

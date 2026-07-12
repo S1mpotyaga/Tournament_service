@@ -3,10 +3,12 @@ services:
     image: postgres:16
     container_name: tournament-db
     restart: unless-stopped
+    env_file:
+      - .env.prod
     environment:
-      POSTGRES_DB: tournament-db
-      POSTGRES_USER: molodec
-      POSTGRES_PASSWORD: glebmolodec
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "25432:5432"
     volumes:
@@ -22,14 +24,12 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    env_file:
+      - .env.prod
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: tournament-db
-      DB_USER: molodec
-      DB_PASSWORD: glebmolodec
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     ports:
-      - "8081:8080"
+      - "8080:8080"
     networks:
       - tournament-network
 
