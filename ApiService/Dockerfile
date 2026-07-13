@@ -16,7 +16,7 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY --from=build /app/ApiService/target/*.jar app.jar
+COPY --from=build /tournament-service/ApiService/target/*.jar app.jar
 
 EXPOSE 8081
 

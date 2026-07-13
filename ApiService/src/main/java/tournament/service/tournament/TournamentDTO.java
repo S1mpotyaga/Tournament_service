@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Builder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 public record TournamentDTO(
@@ -15,22 +15,24 @@ public record TournamentDTO(
         @NotNull
         String tournamentName,
 
-        @NotNull
         String tournamentDescription,
 
+        @NotNull
         TournamentBracketType tournamentBracketType,
+
+        @NotNull
         TournamentStatus tournamentStatus,
 
         @NotNull
         @FutureOrPresent
-        LocalDate registrationStart,
+        LocalDateTime registrationStart,
 
         @NotNull
         @FutureOrPresent
-        LocalDate registrationEnd,
+        LocalDateTime registrationEnd,
 
         @NotNull
         @PastOrPresent
-        LocalDate createdAt
+        LocalDateTime createdAt
 ) {
 }

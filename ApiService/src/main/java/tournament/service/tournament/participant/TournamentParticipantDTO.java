@@ -2,8 +2,6 @@ package tournament.service.tournament.participant;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import tournament.service.tournament.TournamentEntity;
-import tournament.service.user.UserEntity;
 
 import java.time.LocalDateTime;
 
@@ -12,10 +10,10 @@ public record TournamentParticipantDTO(
         Long participantId,
 
         @NotNull
-        UserEntity user,
+        Long userId,
 
         @NotNull
-        TournamentEntity tournament,
+        Long tournamentId,
 
         @NotNull
         TournamentParticipantStatus participantStatus,
@@ -25,6 +23,6 @@ public record TournamentParticipantDTO(
         LocalDateTime registrationDate,
 
         @NotNull
-        UserEntity createdBy
+        Long createdById
 ) {
 }

@@ -2,16 +2,14 @@ package tournament.service.tournament;
 
 import jakarta.persistence.*;
 import lombok.*;
-import tournament.service.match.MatchEntity;
-import tournament.service.tournament.participant.TournamentParticipantEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 
 @Builder
 
@@ -29,8 +27,7 @@ public class TournamentEntity {
             length = 100)
     private String name;
 
-    @Column(name = "description",
-            nullable = false)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "bracket_type",
@@ -43,8 +40,7 @@ public class TournamentEntity {
     @Enumerated(EnumType.STRING)
     private TournamentStatus tournamentStatus;
 
-    @Column(name = "max_participants",
-            nullable = false)
+    @Column(name = "max_participants")
     private Integer maxParticipants;
 
     @Column(name = "registration_start",
@@ -66,9 +62,4 @@ public class TournamentEntity {
             nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY)
-    private List<TournamentParticipantEntity> participants;
-
-    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY)
-    private List<MatchEntity> matches;
 }

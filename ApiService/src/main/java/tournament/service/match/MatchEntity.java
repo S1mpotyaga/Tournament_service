@@ -5,15 +5,16 @@ import lombok.*;
 import tournament.service.tournament.TournamentEntity;
 import tournament.service.tournament.participant.TournamentParticipantEntity;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 
 @Builder
 
 @Entity
-@Table(name = "match")
+@Table(name = "matches")
 public class MatchEntity {
 
     @Id
@@ -21,23 +22,28 @@ public class MatchEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long matchId;
 
-    @ManyToOne
-    @JoinColumn(name = "participant_id_1")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "participant_id_1",
+            nullable = false)
     private TournamentParticipantEntity participant1;
 
-    @ManyToOne
-    @JoinColumn(name = "participant_id_2")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "participant_id_2",
+            nullable = false)
     private TournamentParticipantEntity participant2;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "winner_id")
     private TournamentParticipantEntity winner;
 
-    @ManyToOne
-    @JoinColumn(name = "tournament_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tournament_id",
+            nullable = false)
     private TournamentEntity tournament;
 
-    @Column(name = "status")
+    @Builder.Default
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private MatchStatus matchStatus;
+    private MatchStatus status = MatchStatus.PENDING;
+
 }

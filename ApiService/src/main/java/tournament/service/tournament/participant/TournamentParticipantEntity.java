@@ -7,10 +7,11 @@ import tournament.service.user.UserEntity;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 
 @Builder
 
@@ -23,25 +24,33 @@ public class TournamentParticipantEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long participantId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,
+            optional = false)
     @JoinColumn(name = "user_id",
         nullable = false)
     private UserEntity user;
 
-    @ManyToOne
-    @JoinColumn(name = "tournament_id")
+    @ManyToOne(fetch = FetchType.LAZY,
+            optional = false)
+    @JoinColumn(name = "tournament_id",
+            nullable = false)
     private TournamentEntity tournament;
 
-    @Column(name = "participation_status")
+    @Builder.Default
+    @Column(name = "participation_status",
+            nullable = false)
     @Enumerated(EnumType.STRING)
-    private TournamentParticipantStatus participantStatus;
+    private TournamentParticipantStatus participantStatus = TournamentParticipantStatus.PENDING;
 
+    @Builder.Default
     @Column(name = "registration_date",
         nullable = false)
-    LocalDateTime registrationDate;
+    private LocalDateTime registrationDate = LocalDateTime.now();
 
-    @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY,
+            optional = false)
+    @JoinColumn(name = "created_by",
+            nullable = false)
     private UserEntity createdBy;
 
 }

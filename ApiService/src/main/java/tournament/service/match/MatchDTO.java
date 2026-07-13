@@ -1,21 +1,23 @@
 package tournament.service.match;
 
 import jakarta.validation.constraints.NotNull;
-import tournament.service.tournament.TournamentEntity;
-import tournament.service.tournament.participant.TournamentParticipantEntity;
 
 public record MatchDTO(
         @NotNull
         Long matchId,
 
-        TournamentParticipantEntity participant1,
+        @NotNull
+        Long firstParticipantId,
 
-        TournamentParticipantEntity participant2,
+        @NotNull
+        Long secondParticipantId,
 
-        TournamentParticipantEntity winner,
+        Long winnerId,
 
-        TournamentEntity tournament,
+        @NotNull
+        Long tournamentId,
 
+        @NotNull
         MatchStatus matchStatus
 ) {
 }

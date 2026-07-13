@@ -8,10 +8,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 
 @Builder
 
@@ -29,10 +30,11 @@ public class UserEntity {
             length = 100)
     private String fullName;
 
+    @Builder.Default
     @Column(name = "role",
             nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserRole userRole = UserRole.GUEST;
 
     @Column(name = "password_hash_code",
             nullable = false,
@@ -54,10 +56,4 @@ public class UserEntity {
         unique = true,
         length = 100)
     private String email;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<TournamentParticipantEntity> participations;
-
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    private List<TournamentParticipantEntity> createdParticipations;
 }
