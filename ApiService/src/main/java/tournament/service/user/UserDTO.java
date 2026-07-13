@@ -1,33 +1,31 @@
 package tournament.service.user;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 public record UserDTO(
-        @NotNull
+
+        @Null
         Long id,
 
-        @NotNull
+        @NotBlank
         String fullName,
 
-        @NotNull
         UserRole userRole,
 
-        @NotNull
+        @NotBlank
         String passwordHashCode,
 
-        @NotNull
+        @NotBlank
         String nick,
 
-        @NotNull
         @PastOrPresent
-        LocalDate registrationDate,
+        LocalDateTime registrationDate,
 
-        @NotNull
+        @Email
         String email
 ) {
 }

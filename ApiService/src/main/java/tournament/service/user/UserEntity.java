@@ -2,10 +2,8 @@ package tournament.service.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-import tournament.service.tournament.participant.TournamentParticipantEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 @Data
