@@ -1,25 +1,8 @@
 services:
-  db:
-    image: postgres:16
-    container_name: tournament-db
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "25432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - tournament-network
-
   tournament-api-service:
     build:
-      context: ApiService/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ApiService/Dockerfile
     container_name: tournament-api-service
     restart: unless-stopped
     depends_on:
@@ -28,13 +11,31 @@ services:
       - .env.prod
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: tournament_service
+      DB_USERNAME: postgres
+      DB_PASSWORD: root
     ports:
-      - "8080:8080"
+      - "8080:8081"
     networks:
       - tournament-network
 
-volumes:
-  postgres_data:
+  db:
+    image: postgres:18
+    container_name: tournament-postgres
+    restart: unless-stopped
+    environment:
+      url: jdbc:postgresql://localhost:5432/tournament_service
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql
+    networks:
+      - tournament-network
 
 networks:
   tournament-network:
