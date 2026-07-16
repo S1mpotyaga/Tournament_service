@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: tournament-api-service
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  liquibase:
+    enabled: true
+
+server:
+  port: 8080
