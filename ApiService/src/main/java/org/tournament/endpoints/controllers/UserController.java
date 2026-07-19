@@ -1,5 +1,6 @@
 package org.tournament.endpoints.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,19 +37,23 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(
             @PathVariable("id") int id
     ){
-        log.info("Пришел запрос на получение из UserController.getUserById: " + id);
-        UserDTO userToGet = userService.getUserById(id);
-        return ResponseEntity.ok(userToGet);
+        try {
+            log.info("Пришел запрос на получение из UserController.getUserById: " + id);
+            UserDTO userToGet = userService.getUserById(id);
+            return ResponseEntity.ok(userToGet);
+        } catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserDTO>> getAllUser(
+    public ResponseEntity<List<UserDTO>> getAllUserByFilter(
             @RequestParam(value = "userId", required = false) Integer id,
             @RequestParam(value = "nick", required = false) String nick,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ){
-        log.info("Пришел запрос на получение из UserController.getAllUser");
+        log.info("Пришел запрос на получение из UserController.getAllUserByFilter");
         var filter = new UserSearchFilter(id, nick, pageSize, pageNumber);
         return ResponseEntity.ok(userService.searchAllByFilter(filter));
     }
