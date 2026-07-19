@@ -49,7 +49,7 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUserByFilter(
-            @RequestParam(value = "userId", required = false) Integer id, // Логики вообще нет
+            @RequestParam(value = "userId", required = false) Integer id, // Логики вообще не
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ){
