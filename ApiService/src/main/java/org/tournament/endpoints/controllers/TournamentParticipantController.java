@@ -7,6 +7,7 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.tournament.data.dto.MatchDTO;
 import org.tournament.data.dto.TournamentParticipantDTO;
+import org.tournament.data.dto.UserDTO;
 import org.tournament.endpoints.ConverterException;
 import org.tournament.endpoints.filters.TournamentParticipantFilter;
 import org.tournament.endpoints.services.MatchService;
@@ -51,7 +52,16 @@ public class TournamentParticipantController {
         return ResponseEntity.status(HttpStatus.OK).body(matchService.getAllMatchesByUserIdByFilter(filter));
     }
 
-
+    @GetMapping("tournament/{id}")
+    public ResponseEntity<List<UserDTO>> getAllUsersByTournamentIdByFilter(
+            @PathVariable("id") int tournamentId,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+    ){
+        log.info("Вызван метод получения из TournamentParticipantController.getAllUsersByTournamentIdByFilter");
+        var filter = new TournamentParticipantFilter(null, tournamentId, pageSize, pageNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(tpService.getAllUsersByTournamentIdByFilter(filter));
+    }
 
 
 }
