@@ -1,7 +1,7 @@
 package org.tournament.data.enums;
 
 public enum UserRole {
-    VIEWER,
+    GUEST,
     MODERATOR,
     ADMIN
 }

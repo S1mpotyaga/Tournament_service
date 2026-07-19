@@ -1,10 +1,9 @@
 package org.tournament.data.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.tournament.data.enums.UserRole;
 
 import java.time.LocalDateTime;
@@ -23,8 +22,9 @@ public class UserEntity {
     @Column(name = "full_name", nullable = false)
     private String fullName;
     @Column(name = "role", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole role = UserRole.GUEST;
     @Column(nullable = false)
     private String password;
     @Column(unique = true)

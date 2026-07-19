@@ -1,7 +1,7 @@
 package org.tournament.data.enums;
 
 public enum TournamentStatus {
-    REGESTRATION,
-    IN_PROGRES,
+    REGISTRATION,
+    IN_PROGRESS,
     FINISHIED
 }
