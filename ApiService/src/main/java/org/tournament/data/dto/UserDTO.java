@@ -8,12 +8,13 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
-    private Long userId;
+    private Integer userId;
     private String fullName;
     private UserRole role;
     private String password;
-    private String nickname;
-    private LocalDateTime registrationDime;
+    private String nick;
+    private LocalDateTime registrationTime;
     private String email;
 }
