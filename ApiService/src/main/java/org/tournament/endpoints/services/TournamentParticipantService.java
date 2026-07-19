@@ -13,7 +13,10 @@ public class TournamentParticipantService {
     private final TournamentParticipantMapper mapper;
     private final TournamentParticipantRepository repository;
 
-    public TournamentParticipantService(TournamentParticipantMapper mapper, TournamentParticipantRepository repository){
+    public TournamentParticipantService(
+            TournamentParticipantMapper mapper,
+            TournamentParticipantRepository repository
+    ){
         this.mapper = mapper;
         this.repository = repository;
     }
@@ -22,4 +25,5 @@ public class TournamentParticipantService {
         TournamentParticipantEntity entity = mapper.fromDTO(participant);
         repository.save(entity);
     }
+
 }
