@@ -2,9 +2,9 @@ package org.tournament.endpoints.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.tournament.data.dto.MatchDTO;
 import org.tournament.data.entity.MatchEntity;
 import org.tournament.endpoints.ConverterException;
@@ -19,12 +19,10 @@ import java.util.List;
 public class MatchService {
     private final MatchMapper mapper;
     private final MatchRepository repository;
-    private final PageableHandlerMethodArgumentResolverCustomizer pageableCustomizer;
 
-    public MatchService(MatchMapper mapper, MatchRepository repository, PageableHandlerMethodArgumentResolverCustomizer pageableCustomizer){
+    public MatchService(MatchMapper mapper, MatchRepository repository){
         this.mapper = mapper;
         this.repository = repository;
-        this.pageableCustomizer = pageableCustomizer;
     }
 
     public void createMatch(MatchDTO match) throws ConverterException, JpaSystemException {
@@ -32,6 +30,7 @@ public class MatchService {
         repository.save(entity);
     }
 
+    @Transactional(readOnly = true)
     public MatchDTO getMatchById(int id) {
         MatchEntity matchEntity = repository
                 .findById(id)
@@ -41,6 +40,7 @@ public class MatchService {
         return mapper.fromEntity(matchEntity);
     }
 
+    @Transactional(readOnly = true)
     public List<MatchDTO> getAllMatchByFilter(MatchSearchFilter filter) {
         int pageSize = filter.pageSize() != null ? filter.pageSize() : 15;
         int pageNumber = filter.pageNumber() != null ? filter.pageNumber() : 0;
@@ -53,8 +53,7 @@ public class MatchService {
         return matchEntities.stream().map(mapper::fromEntity).toList();
     }
 
-    // Хоть это и нужно для контроллера tournamentParticipant
-    // Целеосбразнее реализовыввать в реп-рии и сервисе матчей методы
+    @Transactional(readOnly = true)
     public List<MatchDTO> getAllMatchesByUserIdByFilter(TournamentParticipantFilter filter) {
         int pageSize = filter.pageSize() != null ? filter.pageSize() : 15;
         int pageNumber = filter.pageNumber() != null ? filter.pageNumber() : 0;

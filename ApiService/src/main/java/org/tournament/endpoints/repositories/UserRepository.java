@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.tournament.data.entity.UserEntity;
-import org.tournament.endpoints.filters.UserSearchFilter;
 
 import java.util.List;
 
@@ -15,12 +14,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     @Query("""
          SELECT u FROM UserEntity u
-         WHERE(:iserId is null or u.userId = :userId)
-         and(:nick is null or u.nick = :nick)
+         WHERE(:userId is null or u.userId = :userId)
 """)
     List<UserEntity> searchAllByFilter(
-            @Param("userId") int userId,
-            @Param("nick") String nick,
+            @Param("userId") Integer userId,
             Pageable pageable
     );
 }

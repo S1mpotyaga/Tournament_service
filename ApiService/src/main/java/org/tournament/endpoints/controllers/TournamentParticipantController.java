@@ -1,6 +1,6 @@
 package org.tournament.endpoints.controllers;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -15,7 +15,7 @@ import org.tournament.endpoints.services.TournamentParticipantService;
 
 import java.util.List;
 
-@Log
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/participants")
 public class TournamentParticipantController {
@@ -39,29 +39,27 @@ public class TournamentParticipantController {
         }
     }
 
-    @GetMapping("user/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<List<MatchDTO>> getAllMatchesByUserIdByFilter(
             @PathVariable("id") int userId,
             @RequestParam(value = "tournamentId", required = false) Integer tournamentId,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
-
     ){
-        log.info("Вызван метод получения из TournamentParticipantController.getAllMatchesByUserId");
+        log.info("Вызван метод получения из TournamentParticipantController.getAllMatchesByUserId: id={}", userId);
         var filter = new TournamentParticipantFilter(userId, tournamentId, pageSize, pageNumber);
         return ResponseEntity.status(HttpStatus.OK).body(matchService.getAllMatchesByUserIdByFilter(filter));
     }
 
-    @GetMapping("tournament/{id}")
+    @GetMapping("/tournament/{id}")
     public ResponseEntity<List<UserDTO>> getAllUsersByTournamentIdByFilter(
             @PathVariable("id") int tournamentId,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ){
-        log.info("Вызван метод получения из TournamentParticipantController.getAllUsersByTournamentIdByFilter");
+        log.info("Вызван метод получения из " +
+                "TournamentParticipantController.getAllUsersByTournamentIdByFilter: id={}", tournamentId);
         var filter = new TournamentParticipantFilter(null, tournamentId, pageSize, pageNumber);
         return ResponseEntity.status(HttpStatus.OK).body(tpService.getAllUsersByTournamentIdByFilter(filter));
     }
-
-
 }

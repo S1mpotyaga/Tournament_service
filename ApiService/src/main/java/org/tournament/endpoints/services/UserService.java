@@ -32,7 +32,7 @@ public class UserService {
         UserEntity userEntity = repository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Пользователя с данным id не найдено"
+                        "Not found user with id=" + id
                 ));
         return mapper.fromEntity(userEntity);
     }
@@ -44,7 +44,6 @@ public class UserService {
 
         List<UserEntity> allUserEntities = repository.searchAllByFilter(
                 filter.userId(),
-                filter.nick(),
                 pageable
         );
         return allUserEntities.stream().map(mapper::fromEntity).toList();

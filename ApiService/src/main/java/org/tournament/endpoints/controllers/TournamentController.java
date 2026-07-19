@@ -35,7 +35,7 @@ public class TournamentController {
             @PathVariable("id") int id
     ){
         try {
-            log.info("Вызван метод получения из TournamentController.getTournamentById");
+            log.info("Вызван метод получения из TournamentController.getTournamentById: id={}", id);
             TournamentDTO tournamentDTO = tournamentService.getTournamentById(id);
             return ResponseEntity.status(HttpStatus.OK).body(tournamentDTO);
         } catch (EntityNotFoundException e){

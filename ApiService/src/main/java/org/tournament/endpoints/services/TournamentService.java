@@ -28,7 +28,7 @@ public class TournamentService {
         TournamentEntity tournamentEntity = repository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Not found tournament with id: " + id
+                        "Not found tournament with id=" + id
                 ));
         return mapper.fromEntity(tournamentEntity);
     }

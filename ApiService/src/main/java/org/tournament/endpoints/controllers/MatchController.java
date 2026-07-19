@@ -1,7 +1,7 @@
 package org.tournament.endpoints.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/match")
-@Log
+@Slf4j
 public class MatchController {
     private final MatchService matchService;
 
@@ -38,10 +38,11 @@ public class MatchController {
             @PathVariable("id") int id
     ){
         try {
-            log.info("Вызван метод получения из MatchController.getMatchById: " + id);
+            log.info("Вызван метод получения из MatchController.getMatchById: id={}", id);
             MatchDTO matchToGet = matchService.getMatchById(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(matchToGet);
+            return ResponseEntity.status(HttpStatus.OK).body(matchToGet);
         } catch (EntityNotFoundException e){
+            log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }

@@ -51,5 +51,4 @@ public class TournamentParticipantService {
                 .map(participant -> userMapper.fromEntity(participant.getUser()))
                 .toList();
     }
-
 }

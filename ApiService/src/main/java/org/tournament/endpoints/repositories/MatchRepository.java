@@ -13,8 +13,11 @@ import java.util.List;
 public interface MatchRepository extends JpaRepository<MatchEntity, Integer> {
 
     @Query("""
-    SELECT m FROM MatchEntity m
-    where(:tournamentId == null or m.tournament == :tournamentEntity)
+    SELECT DISTINCT m FROM MatchEntity m
+    LEFT JOIN FETCH m.player1
+    LEFT JOIN FETCH m.player2
+    LEFT JOIN FETCH m.tournament
+    where(:tournamentId == null or m.tournament.tournamentId == :tournamentId)
 """)
     List<MatchEntity> searchAllByFilter(
             Integer tournamentId,
@@ -22,7 +25,10 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Integer> {
     );
 
     @Query("""
-    SELECT m FROM MatchEntity m
+    SELECT DISTINCT m FROM MatchEntity m
+    LEFT JOIN FETCH m.player1
+    LEFT JOIN FETCH m.player2
+    LEFT JOIN FETCH m.tournament
     where(:tournamentId IS NULL OR m.tournament.tournamentId = :tournamentId)
     and(m.player1.userId = :userId or m.player2.userId = :userId)
 """)
