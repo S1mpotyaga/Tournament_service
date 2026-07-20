@@ -1,5 +1,6 @@
 package org.tournament.endpoints.controllers;
 
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +43,9 @@ public class TournamentParticipantController {
     @GetMapping("/user/{id}")
     public ResponseEntity<List<MatchDTO>> getAllMatchesByUserIdByFilter(
             @PathVariable("id") int userId,
-            @RequestParam(value = "tournamentId", required = false) Integer tournamentId,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+            @RequestParam(value = "tournamentId", required = false) @Min(1) Integer tournamentId,
+            @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
     ){
         log.info("Вызван метод получения из TournamentParticipantController.getAllMatchesByUserId: id={}", userId);
         var filter = new TournamentParticipantFilter(userId, tournamentId, pageSize, pageNumber);
@@ -53,9 +54,9 @@ public class TournamentParticipantController {
 
     @GetMapping("/tournament/{id}")
     public ResponseEntity<List<UserDTO>> getAllUsersByTournamentIdByFilter(
-            @PathVariable("id") int tournamentId,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+            @PathVariable("id") @Min(1) Integer tournamentId,
+            @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
     ){
         log.info("Вызван метод получения из " +
                 "TournamentParticipantController.getAllUsersByTournamentIdByFilter: id={}", tournamentId);
