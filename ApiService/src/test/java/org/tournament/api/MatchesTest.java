@@ -1,4 +1,4 @@
-package org.tournament;
+package org.tournament.api;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,8 +65,6 @@ public class MatchesTest {
     @Test
     public void getMatchById_whenMatchNotExist_thenThrowNotFound() throws Exception{
 
-        MatchDTO matchDTO = new MatchDTO();
-        matchDTO.setMatchId(999);
         when(matchService.getMatchById(999))
                 .thenThrow(new EntityNotFoundException("Not found match with id=999"));
 

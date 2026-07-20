@@ -1,6 +1,7 @@
 package org.tournament.endpoints.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import org.tournament.endpoints.services.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequestMapping("/api/v1/user")
 @Slf4j
 public class UserController {
     private final UserService userService;
@@ -49,9 +50,9 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUserByFilter(
-            @RequestParam(value = "userId", required = false) Integer id, // Логики вообще не
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+            @RequestParam(value = "userId", required = false) @Min(1) Integer id,
+            @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
     ){
         log.info("Вызван метод получения из UserController.getAllUserByFilter");
         var filter = new UserSearchFilter(id, pageSize, pageNumber);
