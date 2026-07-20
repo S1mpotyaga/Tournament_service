@@ -1,6 +1,7 @@
 package org.tournament.endpoints.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class TournamentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TournamentDTO> getTournamentById(
-            @PathVariable("id") int id
-    ){
+            @PathVariable("id") @Min(1) Integer id
+            ){
         try {
             log.info("Вызван метод получения из TournamentController.getTournamentById: id={}", id);
             TournamentDTO tournamentDTO = tournamentService.getTournamentById(id);

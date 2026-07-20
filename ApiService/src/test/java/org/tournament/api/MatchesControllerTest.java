@@ -14,7 +14,6 @@ import org.tournament.data.dto.MatchDTO;
 import org.tournament.data.enums.MatchStatus;
 import org.tournament.endpoints.controllers.MatchController;
 import org.tournament.endpoints.filters.MatchSearchFilter;
-import org.tournament.endpoints.mappers.MatchMapper;
 import org.tournament.endpoints.services.MatchService;
 
 import java.util.List;
@@ -30,14 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MatchesTest {
+public class MatchesControllerTest {
 
     @Mock
     private MatchService matchService;
-
-    @Mock
-    private MatchMapper matchMapper;
-
     @InjectMocks
     private MatchController matchController;
 

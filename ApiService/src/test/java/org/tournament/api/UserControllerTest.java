@@ -14,7 +14,6 @@ import org.tournament.data.dto.UserDTO;
 import org.tournament.data.enums.UserRole;
 import org.tournament.endpoints.controllers.UserController;
 import org.tournament.endpoints.filters.UserSearchFilter;
-import org.tournament.endpoints.mappers.UserMapper;
 import org.tournament.endpoints.services.UserService;
 
 import java.util.List;
@@ -30,12 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserTest {
+public class UserControllerTest {
 
     @Mock
     private UserService userService;
-    @Mock
-    private UserMapper userMapper;
     @InjectMocks
     private UserController userController;
 
