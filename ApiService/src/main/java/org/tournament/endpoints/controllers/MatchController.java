@@ -1,6 +1,7 @@
 package org.tournament.endpoints.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,11 +51,12 @@ public class MatchController {
     @GetMapping("/all")
     public ResponseEntity<List<MatchDTO>> findAllMatchesByFilter(
             @RequestParam(value = "tournamentId", required = false) Integer id,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+            @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
     ){
         log.info("Вызван метод получения из MatchController.findAllMatchesByFilter");
         var filter = new MatchSearchFilter(id, pageSize, pageNumber);
         return ResponseEntity.status(HttpStatus.OK).body(matchService.getAllMatchByFilter(filter));
     }
+
 }
