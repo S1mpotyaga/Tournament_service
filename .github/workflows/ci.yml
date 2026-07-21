@@ -6,16 +6,15 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
     services:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: tournament_service
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: root
+          POSTGRES_DB: ${{ secrets.TEST_DB_NAME }}
+          POSTGRES_USER: ${{ secrets.TEST_DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -40,7 +39,8 @@ jobs:
           SPRING_PROFILES_ACTIVE: local
           DB_HOST: localhost
           DB_PORT: 5432
-          DB_NAME: tournament_service
-          DB_USER: postgres
-          DB_PASSWORD: root
+          DB_NAME: ${{ secrets.TEST_DB_NAME }}
+          DB_USER: ${{ secrets.TEST_DB_USER }}
+          DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+
         run: mvn -pl ApiService -am test
