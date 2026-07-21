@@ -17,7 +17,7 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Integer> {
     LEFT JOIN FETCH m.player1
     LEFT JOIN FETCH m.player2
     LEFT JOIN FETCH m.tournament
-    where(:tournamentId == null or m.tournament.tournamentId == :tournamentId)
+    where(:tournamentId = null or m.tournament.tournamentId = :tournamentId)
 """)
     List<MatchEntity> searchAllByFilter(
             Integer tournamentId,
