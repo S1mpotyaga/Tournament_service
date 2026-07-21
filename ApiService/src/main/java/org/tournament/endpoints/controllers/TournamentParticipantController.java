@@ -1,31 +1,66 @@
 package org.tournament.endpoints.controllers;
 
+import jakarta.validation.constraints.Min;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.tournament.data.dto.MatchDTO;
 import org.tournament.data.dto.TournamentParticipantDTO;
+import org.tournament.data.dto.UserDTO;
 import org.tournament.endpoints.ConverterException;
+import org.tournament.endpoints.filters.TournamentParticipantFilter;
+import org.tournament.endpoints.services.MatchService;
 import org.tournament.endpoints.services.TournamentParticipantService;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/participants")
 public class TournamentParticipantController {
-    private final TournamentParticipantService service;
+    private final TournamentParticipantService tpService;
+    private final MatchService matchService;
 
-    public TournamentParticipantController(TournamentParticipantService service){
-        this.service = service;
+    public TournamentParticipantController(
+            TournamentParticipantService tpService,
+            MatchService matchService){
+        this.tpService = tpService;
+        this.matchService = matchService;
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createParticipant(TournamentParticipantDTO dto){
         try{
-            service.createParticipant(dto);
+            tpService.createParticipant(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
         } catch (ConverterException | JpaSystemException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<MatchDTO>> getAllMatchesByUserIdByFilter(
+            @PathVariable("id") int userId,
+            @RequestParam(value = "tournamentId", required = false) @Min(1) Integer tournamentId,
+            @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
+    ){
+        log.info("Вызван метод получения из TournamentParticipantController.getAllMatchesByUserId: id={}", userId);
+        var filter = new TournamentParticipantFilter(userId, tournamentId, pageSize, pageNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(matchService.getAllMatchesByUserIdByFilter(filter));
+    }
+
+    @GetMapping("/tournament/{id}")
+    public ResponseEntity<List<UserDTO>> getAllUsersByTournamentIdByFilter(
+            @PathVariable("id") @Min(1) Integer tournamentId,
+            @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
+    ){
+        log.info("Вызван метод получения из " +
+                "TournamentParticipantController.getAllUsersByTournamentIdByFilter: id={}", tournamentId);
+        var filter = new TournamentParticipantFilter(null, tournamentId, pageSize, pageNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(tpService.getAllUsersByTournamentIdByFilter(filter));
     }
 }

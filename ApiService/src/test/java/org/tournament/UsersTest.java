@@ -23,6 +23,7 @@ public class UsersTest {
     @InjectMocks
     private UserService userService;
 
+
     @Test
     public void shoudCreateUser(){
         UserDTO userDTO = new UserDTO();
