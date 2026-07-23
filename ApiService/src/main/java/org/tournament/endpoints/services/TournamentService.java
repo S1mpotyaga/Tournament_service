@@ -3,6 +3,7 @@ package org.tournament.endpoints.services;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.tournament.data.dto.TournamentDTO;
 import org.tournament.data.entity.TournamentEntity;
 import org.tournament.endpoints.ConverterException;
@@ -24,7 +25,9 @@ public class TournamentService {
         repository.save(entity);
     }
 
-    public TournamentDTO getTournamentById(int id) {
+    @Transactional(readOnly = true)
+    public TournamentDTO getTournamentById(int id)
+    throws EntityNotFoundException, ConverterException{
         TournamentEntity tournamentEntity = repository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(

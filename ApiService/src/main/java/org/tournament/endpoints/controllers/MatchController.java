@@ -6,14 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.tournament.data.dto.MatchDTO;
 import org.tournament.endpoints.ConverterException;
-import org.tournament.endpoints.filters.MatchSearchFilter;
+import org.tournament.endpoints.filters.pageable.PageableFilter;
 import org.tournament.endpoints.services.MatchService;
 
-import java.util.List;
-
+@Validated
 @RestController
 @RequestMapping("/api/v1/match")
 @Slf4j
@@ -35,28 +35,35 @@ public class MatchController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MatchDTO> getMatchById(
+    public ResponseEntity<?> getMatchById(
             @PathVariable("id") int id
     ){
         try {
-            log.info("Вызван метод получения из MatchController.getMatchById: id={}", id);
+            log.debug("Вызван метод получения из MatchController.getMatchById: id={}", id);
             MatchDTO matchToGet = matchService.getMatchById(id);
             return ResponseEntity.status(HttpStatus.OK).body(matchToGet);
         } catch (EntityNotFoundException e){
-            log.error(e.getMessage());
+            log.error("Ошибка с получением матча по id", e);
             return ResponseEntity.notFound().build();
+        } catch (ConverterException e){
+            log.error("Ошибка конвертации матча в DTO", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<MatchDTO>> findAllMatchesByFilter(
-            @RequestParam(value = "tournamentId", required = false) Integer id,
+    public ResponseEntity<?> findAllMatchesByFilter(
             @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
-    ){
-        log.info("Вызван метод получения из MatchController.findAllMatchesByFilter");
-        var filter = new MatchSearchFilter(id, pageSize, pageNumber);
-        return ResponseEntity.status(HttpStatus.OK).body(matchService.getAllMatchByFilter(filter));
-    }
 
+    ){
+        log.debug("Вызван метод получения из MatchController.findAllMatchesByFilter");
+        var filter = new PageableFilter(pageSize, pageNumber);
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(matchService.findAllMatches(filter));
+        } catch (ConverterException e){
+            log.error("Ошибка конвертации матчей в DTO", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

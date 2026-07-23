@@ -1,37 +1,32 @@
 package org.tournament.api;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.tournament.data.dto.TournamentDTO;
+import org.tournament.endpoints.ConverterException;
 import org.tournament.endpoints.controllers.TournamentController;
 import org.tournament.endpoints.services.TournamentService;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(TournamentController.class)
+@AutoConfigureMockMvc
 public class TournamentControllerTest {
 
-    @Mock
+    @MockBean
     private TournamentService tournamentService;
-    @InjectMocks
-    private TournamentController controller;
-
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp(){
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-    }
 
     @Test
     void getTournamentById_ifTournamentExist_thenReturnTournamentDTO() throws Exception{
@@ -43,6 +38,7 @@ public class TournamentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tournamentId").value(1))
                 .andExpect(jsonPath("$.description").value("check"));
+        verify(tournamentService).getTournamentById(1);
     }
 
     @Test
@@ -54,17 +50,31 @@ public class TournamentControllerTest {
 
         mockMvc.perform(get("/api/v1/tournament/999"))
                 .andExpect(status().isNotFound());
+        verify(tournamentService).getTournamentById(999);
+
     }
 
     @Test
     void getTournamentById_ifIdNotInteger_thenReturnBadRequest() throws Exception{
         mockMvc.perform(get("/api/v1/tournament/abc"))
                 .andExpect(status().isBadRequest());
+        verifyNoInteractions(tournamentService);
     }
 
     @Test
     void getTournamentById_ifIdNotPositive_thenReturnBadRequest() throws Exception{
-        mockMvc.perform(get("/api/v1/tournament/-1"))
+        assertThrows(ServletException.class, () ->
+                        mockMvc.perform(get("/api/v1/tournament/-1")));
+        verifyNoInteractions(tournamentService);
+    }
+
+    @Test
+    void getTournamentById_ifConverterException_thenReturnBadRequest() throws Exception{
+        when(tournamentService.getTournamentById(1))
+                .thenThrow(new ConverterException("mapping error"));
+        mockMvc.perform(get("/api/v1/tournament/1"))
                 .andExpect(status().isBadRequest());
+        verify(tournamentService).getTournamentById(1);
+
     }
 }

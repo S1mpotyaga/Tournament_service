@@ -1,47 +1,35 @@
 package org.tournament.api;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.tournament.data.dto.MatchDTO;
 import org.tournament.data.enums.MatchStatus;
 import org.tournament.endpoints.controllers.MatchController;
-import org.tournament.endpoints.filters.MatchSearchFilter;
+import org.tournament.endpoints.filters.pageable.PageableFilter;
 import org.tournament.endpoints.services.MatchService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(MatchController.class)
 public class MatchesControllerTest {
 
-    @Mock
+    @MockBean
     private MatchService matchService;
-    @InjectMocks
-    private MatchController matchController;
-
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp(){
-        mockMvc = MockMvcBuilders.standaloneSetup(matchController).build();
-    }
 
     @Test
     public void getMatchById_whenMatchExist_thenReturnMatchDTO() throws Exception{
@@ -55,6 +43,7 @@ public class MatchesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.matchId").value(1))
                 .andExpect(jsonPath("$.matchStatus").value("PENDING"));
+        verify(matchService).getMatchById(1);
     }
 
     @Test
@@ -65,12 +54,14 @@ public class MatchesControllerTest {
 
         mockMvc.perform(get("/api/v1/match/999"))
                 .andExpect(status().isNotFound());
+        verify(matchService).getMatchById(999);
     }
 
     @Test
     public void getMatchById_whenMatchIdNotInteger_thenThrowBadRequest() throws Exception{
         mockMvc.perform(get("/api/v1/match/abc"))
                 .andExpect(status().isBadRequest());
+        verifyNoInteractions(matchService);
     }
 
     @Test
@@ -83,7 +74,7 @@ public class MatchesControllerTest {
         matchDTO2.setMatchId(2);
         matchDTO2.setMatchStatus(MatchStatus.FINISHED);
 
-        when(matchService.getAllMatchByFilter(any(MatchSearchFilter.class)))
+        when(matchService.findAllMatches(any(PageableFilter.class)))
                 .thenReturn(List.of(matchDTO1, matchDTO2));
 
         mockMvc.perform(get("/api/v1/match/all"))
@@ -91,11 +82,12 @@ public class MatchesControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].matchId").value(1))
                 .andExpect((jsonPath("$[1].matchStatus")).value("FINISHED"));
+        verify(matchService).findAllMatches(any(PageableFilter.class));
     }
 
     @Test
     public void findAllMatchesByFilter_whenUsePagination_thenCheckEqualsOfFilterParams() throws Exception{
-        when(matchService.getAllMatchByFilter(any(MatchSearchFilter.class)))
+        when(matchService.findAllMatches(any(PageableFilter.class)))
                 .thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/match/all")
@@ -103,17 +95,17 @@ public class MatchesControllerTest {
                         .param("pageNumber", "1"))
                 .andExpect(status().isOk());
 
-        ArgumentCaptor<MatchSearchFilter> filterCaptor = ArgumentCaptor.forClass(MatchSearchFilter.class);
-        verify(matchService).getAllMatchByFilter(filterCaptor.capture());
+        ArgumentCaptor<PageableFilter> filterCaptor = ArgumentCaptor.forClass(PageableFilter.class);
+        verify(matchService).findAllMatches(filterCaptor.capture());
 
-        MatchSearchFilter capturedFilter = filterCaptor.getValue();
+        PageableFilter capturedFilter = filterCaptor.getValue();
         assertEquals(2, capturedFilter.pageSize());
         assertEquals(1, capturedFilter.pageNumber());
     }
 
     @Test
     public void findAllMatchesByFilter_whenMatchDTOTableIsEmpty_thenReturnEmptyList() throws Exception{
-        when(matchService.getAllMatchByFilter(any(MatchSearchFilter.class)))
+        when(matchService.findAllMatches(any(PageableFilter.class)))
                 .thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/match/all"))
@@ -122,26 +114,12 @@ public class MatchesControllerTest {
     }
 
     @Test
-    public void findAllMatchesByFilter_whenMatchDTOIsExist_thenReturnMatchDTOId() throws Exception{
-        when(matchService.getAllMatchByFilter(any(MatchSearchFilter.class)))
-                .thenReturn(List.of());
-
-        mockMvc.perform(get("/api/v1/match/all")
-                        .param("tournamentId", "42"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
-        ArgumentCaptor<MatchSearchFilter> filterCaptor = ArgumentCaptor.forClass(MatchSearchFilter.class);
-        verify(matchService).getAllMatchByFilter(filterCaptor.capture());
-
-        MatchSearchFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(42, capturedFilter.tournamentId());
-    }
-
-    @Test
-    public void findAllMatchesByFilter_whenInvalidPageNumber_thenThrowBadRequest() throws Exception{
-        mockMvc.perform(get("/api/v1/match/all")
+    public void findAllMatchesByFilter_whenInvalidPageNumber_thenThrowBadRequest() {
+        assertThrows(ServletException.class, () -> mockMvc.perform(get("/api/v1/match/all")
                 .param("pageNumber", "-5"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest()));
+        verifyNoInteractions(matchService);
+
     }
 
     @Test
@@ -149,18 +127,19 @@ public class MatchesControllerTest {
         mockMvc.perform(get("/api/v1/match/all")
                 .param("pageSize", "243342fde"))
                 .andExpect(status().isBadRequest());
+        verifyNoInteractions(matchService);
     }
 
     @Test
     public void findAllMatchesByFilter_whenInvalidParamsIsNull_thenCheckParamsIsNull() throws Exception{
-        when(matchService.getAllMatchByFilter(any(MatchSearchFilter.class)))
+        when(matchService.findAllMatches(any(PageableFilter.class)))
                 .thenReturn(List.of());
         mockMvc.perform(get("/api/v1/match/all"))
                 .andExpect(status().isOk());
-        ArgumentCaptor<MatchSearchFilter> filterCaptor = ArgumentCaptor.forClass(MatchSearchFilter.class);
-        verify(matchService).getAllMatchByFilter(filterCaptor.capture());
+        ArgumentCaptor<PageableFilter> filterCaptor = ArgumentCaptor.forClass(PageableFilter.class);
+        verify(matchService).findAllMatches(filterCaptor.capture());
 
-        MatchSearchFilter capturedFilter = filterCaptor.getValue();
+        PageableFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.pageSize());
         assertNull(capturedFilter.pageNumber());
     }

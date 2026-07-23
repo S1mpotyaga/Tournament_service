@@ -1,6 +1,7 @@
 package org.tournament.endpoints.repositories;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,29 +13,19 @@ import java.util.List;
 @Repository
 public interface MatchRepository extends JpaRepository<MatchEntity, Integer> {
 
-    @Query("""
-    SELECT DISTINCT m FROM MatchEntity m
-    LEFT JOIN FETCH m.player1
-    LEFT JOIN FETCH m.player2
-    LEFT JOIN FETCH m.tournament
-    where(:tournamentId == null or m.tournament.tournamentId == :tournamentId)
-""")
-    List<MatchEntity> searchAllByFilter(
-            Integer tournamentId,
+    @EntityGraph(attributePaths = {"player1", "player2", "tournament"})
+    @Query("SELECT m FROM MatchEntity m")
+    List<MatchEntity> findAllWithRelations(
             Pageable pageable
     );
 
+    @EntityGraph(attributePaths = {"player1", "player2", "tournament"})
     @Query("""
-    SELECT DISTINCT m FROM MatchEntity m
-    LEFT JOIN FETCH m.player1
-    LEFT JOIN FETCH m.player2
-    LEFT JOIN FETCH m.tournament
-    where(:tournamentId IS NULL OR m.tournament.tournamentId = :tournamentId)
-    and(m.player1.userId = :userId or m.player2.userId = :userId)
+    SELECT m FROM MatchEntity m
+    where (m.player1.userId = :userId or m.player2.userId = :userId)
 """)
-    List<MatchEntity> findByUserIdAndTournamentId(
+    List<MatchEntity> findByUser(
             @Param("userId") int userId,
-            @Param("tournamentId") Integer tournamentId,
             Pageable pageable
     );
 }

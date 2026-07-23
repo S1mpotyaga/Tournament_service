@@ -6,14 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.tournament.data.dto.UserDTO;
 import org.tournament.endpoints.ConverterException;
-import org.tournament.endpoints.filters.UserSearchFilter;
+import org.tournament.endpoints.filters.pageable.PageableFilter;
 import org.tournament.endpoints.services.UserService;
 
-import java.util.List;
-
+@Validated
 @RestController
 @RequestMapping("/api/v1/user")
 @Slf4j
@@ -35,27 +35,34 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(
+    public ResponseEntity<?> getUserById(
             @PathVariable("id") int id
     ){
         try {
-            log.info("Вызван метод получения из UserController.getUserById: id={}", id);
+            log.debug("Вызван метод получения из UserController.getUserById: id={}", id);
             UserDTO userToGet = userService.getUserById(id);
             return ResponseEntity.ok(userToGet);
         } catch (EntityNotFoundException e){
-            log.error(e.getMessage());
+            log.error("Ошибка с получением пользователя по id", e);
             return ResponseEntity.notFound().build();
+        } catch (ConverterException e){
+            log.error("Ошибка конвертации в DTO", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserDTO>> getAllUserByFilter(
-            @RequestParam(value = "userId", required = false) @Min(1) Integer id,
+    public ResponseEntity<?> findAllUsers(
             @RequestParam(value = "pageSize", required = false) @Min(1) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) @Min(0) Integer pageNumber
     ){
-        log.info("Вызван метод получения из UserController.getAllUserByFilter");
-        var filter = new UserSearchFilter(id, pageSize, pageNumber);
-        return ResponseEntity.ok(userService.searchAllByFilter(filter));
+        try {
+            log.debug("Вызван метод получения из UserController.getAllUserByFilter");
+            var filter = new PageableFilter(pageSize, pageNumber);
+            return ResponseEntity.ok(userService.getAllUsers(filter));
+        } catch (ConverterException e){
+            log.error("Ошибка конвертации пользователей в DTO", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
