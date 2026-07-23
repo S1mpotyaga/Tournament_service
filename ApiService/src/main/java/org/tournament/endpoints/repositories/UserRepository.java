@@ -6,4 +6,5 @@ import org.tournament.data.entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
+
 }
