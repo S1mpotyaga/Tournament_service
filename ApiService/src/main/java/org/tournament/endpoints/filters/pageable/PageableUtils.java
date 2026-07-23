@@ -19,13 +19,13 @@ public final class PageableUtils {
 
         if (pageSize < 1 || pageSize > 100) {
             throw new IllegalArgumentException(
-                    "pageSize must be between 1 and 100"
+                    "pageSize должен быть от 0 до 100"
             );
         }
 
         if (pageNum < 0) {
             throw new IllegalArgumentException(
-                    "pageNumber must be >= 0"
+                    "pageNumber не может быть отрицательным"
             );
         }
 
